@@ -1,6 +1,7 @@
 # RPG Game Login Backend API
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from flask_restful import Api, Resource
+import requests
 
 # Create Blueprint
 rpg_api = Blueprint('rpg_api', __name__)
@@ -120,7 +121,7 @@ class RPGLoginAPI(Resource):
 # --- API Resource for Character Creation ---
 class CharacterAPI(Resource):
     def post(self):
-        """Create a character sheet from form data"""
+        """Create a character sheet from form data with AI-generated analysis"""
         try:
             data = request.get_json()
             
@@ -135,11 +136,23 @@ class CharacterAPI(Resource):
             if not all([name, motivation, fear, secret]):
                 return {'message': 'All fields are required'}, 400
             
-            # Generate character analysis based on game mode
-            if game_mode == 'cozy':
-                analysis = f"{name} has a gentle but determined spirit, with motivations that connect them to their community. Their fear represents vulnerability that makes them relatable and human, while their secret adds intrigue without overwhelming darkness. This character's journey will be one of personal growth and connection, where their motivation guides them to help others, their fear teaches them compassion, and their secret becomes something they learn to share and find acceptance for. Perfect for a story focused on relationships, discovery, and healing."
+            # Get Groq API key
+            api_key = current_app.config.get('GROQ_API_KEY')
+            
+            # Log API key status for debugging
+            current_app.logger.info(f"GROQ API Key configured: {bool(api_key)}")
+            
+            if not api_key:
+                # Fallback to basic analysis if API key not configured
+                current_app.logger.warning("GROQ_API_KEY not found, using basic analysis")
+                print("⚠️ GROQ_API_KEY not found - using basic analysis")
+                analysis = self._generate_basic_analysis(name, motivation, fear, secret, game_mode)
             else:
-                analysis = f"{name} is driven by a powerful motivation that will push them through the most dangerous quests. Their greatest fear creates internal conflict that adds depth to their journey, while their hidden secret provides opportunities for dramatic revelation. This character's motivation and fear are in tension, creating a compelling arc where they must face what they fear most to achieve what they desire. The secret adds a layer of complexity that can be revealed at crucial story moments to deepen relationships with allies or create conflict with enemies."
+                # Generate AI-powered character analysis
+                current_app.logger.info("Generating AI-powered character analysis with Groq")
+                print(f"✅ GROQ_API_KEY found - generating AI analysis for {name}")
+                analysis = self._generate_ai_analysis(name, motivation, fear, secret, game_mode, api_key)
+                print(f"📝 AI Analysis generated: {analysis[:100]}...")
             
             # Create character sheet response
             character_sheet = {
@@ -155,6 +168,85 @@ class CharacterAPI(Resource):
             
         except Exception as e:
             return {'message': f'Error creating character: {str(e)}'}, 500
+    
+    def _generate_ai_analysis(self, name, motivation, fear, secret, game_mode, api_key):
+        """Generate character analysis using Groq AI"""
+        try:
+            # Create a prompt based on game mode
+            if game_mode == 'cozy':
+                prompt = f"""You are a creative RPG character analyst specializing in cozy, heartwarming games. 
+Analyze this character for a cozy game setting where stories focus on relationships, personal growth, and community:
+
+Character Name: {name}
+Motivation: {motivation}
+Fear: {fear}
+Secret: {secret}
+
+Write a warm, encouraging 3-4 sentence analysis that:
+- Explains how their motivation connects them to community and personal growth
+- Describes how their fear adds relatable vulnerability
+- Shows how their secret creates intrigue without being too dark
+- Suggests a positive character arc focused on connection and healing
+
+Keep the tone gentle, optimistic, and focused on emotional growth."""
+            else:
+                prompt = f"""You are a creative RPG character analyst specializing in action-adventure games.
+Analyze this character for an action-packed game setting with quests, challenges, and dramatic storytelling:
+
+Character Name: {name}
+Motivation: {motivation}
+Fear: {fear}
+Secret: {secret}
+
+Write an exciting 3-4 sentence analysis that:
+- Explains how their motivation drives them through dangerous quests
+- Describes the internal conflict their fear creates
+- Shows how their secret adds dramatic complexity
+- Suggests how motivation and fear create tension in their character arc
+
+Keep the tone dynamic, compelling, and focused on adventure and conflict."""
+
+            # Call Groq API
+            response = requests.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={
+                    'Authorization': f'Bearer {api_key}',
+                    'Content-Type': 'application/json'
+                },
+                json={
+                    "model": "llama-3.1-8b-instant",
+                    "messages": [
+                        {"role": "system", "content": "You are a creative RPG character analyst who writes engaging character analyses."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    "temperature": 0.8,
+                    "max_tokens": 300
+                },
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                analysis = result['choices'][0]['message']['content'].strip()
+                print(f"✨ Success! Groq API returned: {analysis[:50]}...")
+                return analysis
+            else:
+                # Fallback to basic analysis if API call fails
+                current_app.logger.error(f"Groq API error: {response.status_code} - {response.text}")
+                print(f"❌ Groq API error: {response.status_code}")
+                return self._generate_basic_analysis(name, motivation, fear, secret, game_mode)
+                
+        except Exception as e:
+            # Fallback to basic analysis on error
+            current_app.logger.error(f"Error generating AI analysis: {e}")
+            return self._generate_basic_analysis(name, motivation, fear, secret, game_mode)
+    
+    def _generate_basic_analysis(self, name, motivation, fear, secret, game_mode):
+        """Fallback basic analysis if AI is unavailable"""
+        if game_mode == 'cozy':
+            return f"{name} has a gentle but determined spirit, with motivations that connect them to their community. Their fear represents vulnerability that makes them relatable and human, while their secret adds intrigue without overwhelming darkness. This character's journey will be one of personal growth and connection, where their motivation guides them to help others, their fear teaches them compassion, and their secret becomes something they learn to share and find acceptance for."
+        else:
+            return f"{name} is driven by a powerful motivation that will push them through the most dangerous quests. Their greatest fear creates internal conflict that adds depth to their journey, while their hidden secret provides opportunities for dramatic revelation. This character's motivation and fear are in tension, creating a compelling arc where they must face what they fear most to achieve what they desire."
 
 # Register API endpoints
 api.add_resource(RPGDataAPI, '/api/rpg/data')
