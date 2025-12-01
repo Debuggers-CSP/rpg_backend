@@ -1,15 +1,13 @@
-# RPG Game Login Backend
-from flask import Flask, jsonify, request
-from flask_cors import CORS
+# RPG Game Login Backend API
+from flask import Blueprint, jsonify, request
 from flask_restful import Api, Resource
 
-app = Flask(__name__)
-CORS(app, supports_credentials=True, origins='*')
+# Create Blueprint
+rpg_api = Blueprint('rpg_api', __name__)
+api = Api(rpg_api)
 
-api = Api(app)
-
-# --- Model class for User Data with CRUD naming ---
-class UserModel:
+# --- Model class for RPG User Data with CRUD naming ---
+class RPGUserModel:
     def __init__(self):
         self.users = [
             {
@@ -59,16 +57,16 @@ class UserModel:
         return None
 
 # Instantiate the model
-user_model = UserModel()
+rpg_user_model = RPGUserModel()
 
-# --- API Resource for User Registration and Retrieval ---
-class DataAPI(Resource):
+# --- API Resource for RPG User Registration and Retrieval ---
+class RPGDataAPI(Resource):
     def get(self):
-        """Get all users"""
-        return jsonify(user_model.read())
+        """Get all RPG users"""
+        return jsonify(rpg_user_model.read())
 
     def post(self):
-        """Register a new user"""
+        """Register a new RPG user"""
         user_data = request.get_json()
         
         # Validate input
@@ -81,7 +79,7 @@ class DataAPI(Resource):
                 return {"message": f"{field} is required"}, 400
         
         # Try to create user
-        new_user = user_model.create(user_data)
+        new_user = rpg_user_model.create(user_data)
         
         if new_user is None:
             return {"message": "User with this GitHub ID already exists"}, 409
@@ -91,10 +89,10 @@ class DataAPI(Resource):
             "user": new_user
         }, 201
 
-# --- API Resource for User Login ---
-class LoginAPI(Resource):
+# --- API Resource for RPG User Login ---
+class RPGLoginAPI(Resource):
     def post(self):
-        """Login a user"""
+        """Login an RPG user"""
         login_data = request.get_json()
         
         # Validate input
@@ -109,7 +107,7 @@ class LoginAPI(Resource):
             return {"message": "FirstName, LastName, and GitHubID are required"}, 400
         
         # Find user
-        user = user_model.find_user(first_name, last_name, github_id)
+        user = rpg_user_model.find_user(first_name, last_name, github_id)
         
         if user:
             return {
@@ -119,13 +117,53 @@ class LoginAPI(Resource):
         else:
             return {"message": "Invalid credentials"}, 401
 
+# --- API Resource for Character Creation ---
+class CharacterAPI(Resource):
+    def post(self):
+        """Create a character sheet from form data"""
+        try:
+            data = request.get_json()
+            
+            # Extract form data
+            name = data.get('name', '').strip()
+            motivation = data.get('motivation', '').strip()
+            fear = data.get('fear', '').strip()
+            secret = data.get('secret', '').strip()
+            game_mode = data.get('gameMode', 'action')
+            
+            # Validate required fields
+            if not all([name, motivation, fear, secret]):
+                return {'message': 'All fields are required'}, 400
+            
+            # Generate character analysis based on game mode
+            if game_mode == 'cozy':
+                analysis = f"{name} has a gentle but determined spirit, with motivations that connect them to their community. Their fear represents vulnerability that makes them relatable and human, while their secret adds intrigue without overwhelming darkness. This character's journey will be one of personal growth and connection, where their motivation guides them to help others, their fear teaches them compassion, and their secret becomes something they learn to share and find acceptance for. Perfect for a story focused on relationships, discovery, and healing."
+            else:
+                analysis = f"{name} is driven by a powerful motivation that will push them through the most dangerous quests. Their greatest fear creates internal conflict that adds depth to their journey, while their hidden secret provides opportunities for dramatic revelation. This character's motivation and fear are in tension, creating a compelling arc where they must face what they fear most to achieve what they desire. The secret adds a layer of complexity that can be revealed at crucial story moments to deepen relationships with allies or create conflict with enemies."
+            
+            # Create character sheet response
+            character_sheet = {
+                'name': name,
+                'motivation': motivation,
+                'fear': fear,
+                'secret': secret,
+                'gameMode': game_mode,
+                'analysis': analysis
+            }
+            
+            return character_sheet, 200
+            
+        except Exception as e:
+            return {'message': f'Error creating character: {str(e)}'}, 500
+
 # Register API endpoints
-api.add_resource(DataAPI, '/api/data')
-api.add_resource(LoginAPI, '/api/login')
+api.add_resource(RPGDataAPI, '/api/rpg/data')
+api.add_resource(RPGLoginAPI, '/api/rpg/login')
+api.add_resource(CharacterAPI, '/api/rpg/character')
 
 # HTML endpoint for testing
-@app.route('/')
-def home():
+@rpg_api.route('/rpg')
+def rpg_home():
     html_content = """
     <html>
     <head>
@@ -166,13 +204,13 @@ def home():
             <h2>Available Endpoints:</h2>
             
             <div class="endpoint">
-                <h3>GET /api/data</h3>
-                <p>Retrieve all registered users</p>
+                <h3>GET /api/rpg/data</h3>
+                <p>Retrieve all registered RPG users</p>
             </div>
             
             <div class="endpoint">
-                <h3>POST /api/data</h3>
-                <p>Register a new user</p>
+                <h3>POST /api/rpg/data</h3>
+                <p>Register a new RPG user</p>
                 <p><strong>Body:</strong></p>
                 <code>
                     {
@@ -184,8 +222,8 @@ def home():
             </div>
             
             <div class="endpoint">
-                <h3>POST /api/login</h3>
-                <p>Login an existing user</p>
+                <h3>POST /api/rpg/login</h3>
+                <p>Login an existing RPG user</p>
                 <p><strong>Body:</strong></p>
                 <code>
                     {
@@ -195,21 +233,8 @@ def home():
                     }
                 </code>
             </div>
-            
-            <p style="margin-top: 30px;">
-                <strong>Server URL:</strong> <code>http://localhost:5001</code>
-            </p>
         </div>
     </body>
     </html>
     """
     return html_content
-
-if __name__ == '__main__':
-    print("🎮 RPG Game Backend Starting...")
-    print("📡 Server running on http://localhost:5001")
-    print("📋 Available endpoints:")
-    print("   - GET  /api/data  (Get all users)")
-    print("   - POST /api/data  (Register user)")
-    print("   - POST /api/login (Login user)")
-    app.run(port=5001, debug=True)
