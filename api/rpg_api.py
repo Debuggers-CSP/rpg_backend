@@ -11,15 +11,31 @@ from datetime import datetime
 rpg_api = Blueprint('rpg_api', __name__)
 api = Api(rpg_api)
 
-# Initialize quest database
-def init_quest_db():
-    """Initialize SQLite database for quest tracking"""
-    db_path = 'instance/rpg_quests.db'
+# Initialize RPG database with all tables
+def init_rpg_db():
+    """Initialize SQLite database for RPG game with character sheets and quests tables"""
+    db_path = 'instance/rpg.db'
     os.makedirs('instance', exist_ok=True)
     
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
+    # Create character_sheets table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS character_sheets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_github_id TEXT NOT NULL,
+            name TEXT NOT NULL,
+            motivation TEXT NOT NULL,
+            fear TEXT NOT NULL,
+            secret TEXT NOT NULL,
+            game_mode TEXT NOT NULL,
+            analysis TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    # Create quests table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS quests (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,8 +46,7 @@ def init_quest_db():
             difficulty TEXT NOT NULL,
             reward TEXT NOT NULL,
             game_mode TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_github_id) REFERENCES users(GitHubID)
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     
@@ -39,7 +54,7 @@ def init_quest_db():
     conn.close()
 
 # Call this when the module loads
-init_quest_db()
+init_rpg_db()
 
 # --- API Resource for RPG User Registration and Retrieval ---
 class RPGDataAPI(Resource):
@@ -148,8 +163,32 @@ class CharacterAPI(Resource):
                 analysis = self._generate_ai_analysis(name, motivation, fear, secret, game_mode, api_key)
                 print(f"📝 AI Analysis generated: {analysis[:100]}...")
             
+            # Get user GitHub ID if provided (for saving to database)
+            user_github_id = data.get('userGithubId', '').strip()
+            
+            # Save to database if user is logged in
+            character_id = None
+            if user_github_id:
+                try:
+                    db_path = 'instance/rpg.db'
+                    conn = sqlite3.connect(db_path)
+                    cursor = conn.cursor()
+                    
+                    cursor.execute('''
+                        INSERT INTO character_sheets (user_github_id, name, motivation, fear, secret, game_mode, analysis)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                    ''', (user_github_id, name, motivation, fear, secret, game_mode, analysis))
+                    
+                    character_id = cursor.lastrowid
+                    conn.commit()
+                    conn.close()
+                    print(f"💾 Character sheet saved to database with ID: {character_id}")
+                except Exception as db_error:
+                    print(f"⚠️ Failed to save character to database: {db_error}")
+            
             # Create character sheet response
             character_sheet = {
+                'id': character_id,
                 'name': name,
                 'motivation': motivation,
                 'fear': fear,
@@ -162,6 +201,48 @@ class CharacterAPI(Resource):
             
         except Exception as e:
             return {'message': f'Error creating character: {str(e)}'}, 500
+    
+    def get(self):
+        """Get all character sheets for a specific user"""
+        try:
+            # Get user_github_id from query parameters
+            user_github_id = request.args.get('userGithubId', '').strip()
+            
+            if not user_github_id:
+                return {'message': 'User GitHub ID is required'}, 400
+            
+            db_path = 'instance/rpg.db'
+            conn = sqlite3.connect(db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            
+            # Only get characters for this specific user
+            cursor.execute('''
+                SELECT * FROM character_sheets 
+                WHERE user_github_id = ? 
+                ORDER BY created_at DESC
+            ''', (user_github_id,))
+            
+            rows = cursor.fetchall()
+            conn.close()
+            
+            characters = []
+            for row in rows:
+                characters.append({
+                    'id': row['id'],
+                    'name': row['name'],
+                    'motivation': row['motivation'],
+                    'fear': row['fear'],
+                    'secret': row['secret'],
+                    'gameMode': row['game_mode'],
+                    'analysis': row['analysis'],
+                    'createdAt': row['created_at']
+                })
+            
+            return {'characters': characters}, 200
+            
+        except Exception as e:
+            return {'message': f'Error retrieving characters: {str(e)}'}, 500
     
     def _generate_ai_analysis(self, name, motivation, fear, secret, game_mode, api_key):
         """Generate character analysis using Groq AI"""
@@ -275,7 +356,7 @@ class QuestAPI(Resource):
                 return {'message': f'Missing required fields: {", ".join(missing)}'}, 400
             
             # Save to database with user association
-            db_path = 'instance/rpg_quests.db'
+            db_path = 'instance/rpg.db'
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
             
@@ -318,7 +399,7 @@ class QuestAPI(Resource):
             if not user_github_id:
                 return {'message': 'User GitHub ID is required'}, 400
             
-            db_path = 'instance/rpg_quests.db'
+            db_path = 'instance/rpg.db'
             conn = sqlite3.connect(db_path)
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
