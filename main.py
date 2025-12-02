@@ -45,6 +45,7 @@ from model.classroom import Classroom
 from model.post import Post, init_posts
 from model.microblog import MicroBlog, Topic, init_microblogs
 from hacks.jokes import initJokes 
+from model.rpg_user import initRPGUsers
 # from model.announcement import Announcement ##temporary revert
 
 # server only Views
@@ -86,6 +87,7 @@ app.register_blueprint(rpg_api)  # Register the RPG game API
 # Jokes file initialization
 with app.app_context():
     initJokes()
+    initRPGUsers()  # Initialize RPG users table
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"

@@ -2,69 +2,18 @@
 from flask import Blueprint, jsonify, request, current_app
 from flask_restful import Api, Resource
 import requests
+from model.rpg_user import RPGUser
 
 # Create Blueprint
 rpg_api = Blueprint('rpg_api', __name__)
 api = Api(rpg_api)
 
-# --- Model class for RPG User Data with CRUD naming ---
-class RPGUserModel:
-    def __init__(self):
-        self.users = [
-            {
-                "id": 1,
-                "FirstName": "John",
-                "LastName": "Doe",
-                "GitHubID": "johndoe"
-            },
-            {
-                "id": 2,
-                "FirstName": "Jane",
-                "LastName": "Smith",
-                "GitHubID": "janesmith"
-            }
-        ]
-        self.next_id = 3
-
-    def read(self):
-        """Get all users"""
-        return self.users
-
-    def create(self, user_data):
-        """Create a new user"""
-        # Check if user already exists
-        for user in self.users:
-            if user['GitHubID'] == user_data.get('GitHubID'):
-                return None  # User already exists
-        
-        # Add new user with auto-incrementing ID
-        new_user = {
-            "id": self.next_id,
-            "FirstName": user_data.get('FirstName'),
-            "LastName": user_data.get('LastName'),
-            "GitHubID": user_data.get('GitHubID')
-        }
-        self.users.append(new_user)
-        self.next_id += 1
-        return new_user
-
-    def find_user(self, first_name, last_name, github_id):
-        """Find a user by credentials"""
-        for user in self.users:
-            if (user['FirstName'] == first_name and 
-                user['LastName'] == last_name and 
-                user['GitHubID'] == github_id):
-                return user
-        return None
-
-# Instantiate the model
-rpg_user_model = RPGUserModel()
-
 # --- API Resource for RPG User Registration and Retrieval ---
 class RPGDataAPI(Resource):
     def get(self):
         """Get all RPG users"""
-        return jsonify(rpg_user_model.read())
+        users = RPGUser.query.all()
+        return jsonify([user.read() for user in users])
 
     def post(self):
         """Register a new RPG user"""
@@ -74,20 +23,31 @@ class RPGDataAPI(Resource):
         if not user_data:
             return {"message": "No data provided"}, 400
         
-        required_fields = ['FirstName', 'LastName', 'GitHubID']
+        required_fields = ['FirstName', 'LastName', 'GitHubID', 'Password']
         for field in required_fields:
             if field not in user_data or not user_data[field]:
                 return {"message": f"{field} is required"}, 400
         
-        # Try to create user
-        new_user = rpg_user_model.create(user_data)
-        
-        if new_user is None:
+        # Check if user already exists
+        existing_user = RPGUser.find_by_github_id(user_data['GitHubID'])
+        if existing_user:
             return {"message": "User with this GitHub ID already exists"}, 409
+        
+        # Create new user
+        new_user = RPGUser(
+            first_name=user_data['FirstName'],
+            last_name=user_data['LastName'],
+            github_id=user_data['GitHubID'],
+            password=user_data['Password']
+        )
+        
+        created_user = new_user.create()
+        if created_user is None:
+            return {"message": "Failed to create user"}, 500
         
         return {
             "message": "User registered successfully",
-            "user": new_user
+            "user": created_user.read()
         }, 201
 
 # --- API Resource for RPG User Login ---
@@ -103,17 +63,18 @@ class RPGLoginAPI(Resource):
         first_name = login_data.get('FirstName')
         last_name = login_data.get('LastName')
         github_id = login_data.get('GitHubID')
+        password = login_data.get('Password')
         
-        if not first_name or not last_name or not github_id:
-            return {"message": "FirstName, LastName, and GitHubID are required"}, 400
+        if not first_name or not last_name or not github_id or not password:
+            return {"message": "FirstName, LastName, GitHubID, and Password are required"}, 400
         
-        # Find user
-        user = rpg_user_model.find_user(first_name, last_name, github_id)
+        # Find user in database and verify password
+        user = RPGUser.find_by_credentials(first_name, last_name, github_id, password)
         
         if user:
             return {
                 "message": "Login successful",
-                "user": user
+                "user": user.read()
             }, 200
         else:
             return {"message": "Invalid credentials"}, 401
@@ -308,7 +269,8 @@ def rpg_home():
                     {
                         "FirstName": "string",
                         "LastName": "string",
-                        "GitHubID": "string"
+                        "GitHubID": "string",
+                        "Password": "string"
                     }
                 </code>
             </div>
@@ -321,7 +283,8 @@ def rpg_home():
                     {
                         "FirstName": "string",
                         "LastName": "string",
-                        "GitHubID": "string"
+                        "GitHubID": "string",
+                        "Password": "string"
                     }
                 </code>
             </div>
