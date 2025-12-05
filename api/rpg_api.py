@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request, current_app
 from flask_restful import Api, Resource
 import requests
 from model.rpg_user import RPGUser
+from api.rpg_stories import *  # Story elements data management
 import sqlite3
 import os
 from datetime import datetime
@@ -459,11 +460,51 @@ class QuestAPI(Resource):
         except Exception as e:
             return {'message': f'Error retrieving quests: {str(e)}'}, 500
 
-# Register API endpoints
+# ============================================================================
+# STORY ELEMENTS API RESOURCES
+# ============================================================================
+# These endpoints handle story element data (plot hooks, NPCs, twists, etc.)
+# and voting (love/skip counts) similar to the jokes system
+
+class StoryElementsAPI(Resource):
+    """Get all story elements"""
+    def get(self):
+        return jsonify(getStoryElements())
+
+class StoryElementAPI(Resource):
+    """Get a specific story element by ID"""
+    def get(self, id):
+        return jsonify(getStoryElement(id))
+
+class StoryLoveAPI(Resource):
+    """Increment love count for a story element"""
+    def put(self, id):
+        addStoryLove(id)
+        return jsonify(getStoryElement(id))
+
+class StorySkipAPI(Resource):
+    """Increment skip count for a story element"""
+    def put(self, id):
+        addStorySkip(id)
+        return jsonify(getStoryElement(id))
+
+# ============================================================================
+# REGISTER API ENDPOINTS
+# ============================================================================
+
+# RPG User and Authentication endpoints
 api.add_resource(RPGDataAPI, '/api/rpg/data')
 api.add_resource(RPGLoginAPI, '/api/rpg/login')
+
+# Character and Quest endpoints
 api.add_resource(CharacterAPI, '/api/rpg/character')
 api.add_resource(QuestAPI, '/api/rpg/quest', '/api/rpg/quests')  # Support both singular and plural
+
+# Story Elements endpoints
+api.add_resource(StoryElementsAPI, '/api/rpg/story', '/api/rpg/story/')
+api.add_resource(StoryElementAPI, '/api/rpg/story/<int:id>', '/api/rpg/story/<int:id>/')
+api.add_resource(StoryLoveAPI, '/api/rpg/story/love/<int:id>', '/api/rpg/story/love/<int:id>/')
+api.add_resource(StorySkipAPI, '/api/rpg/story/skip/<int:id>', '/api/rpg/story/skip/<int:id>/')
 
 # HTML endpoint for testing
 @rpg_api.route('/rpg')

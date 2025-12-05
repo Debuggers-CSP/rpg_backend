@@ -1,0 +1,338 @@
+[
+  {
+    "id": 0,
+    "category": "Main Plot Hooks",
+    "element": "A mysterious plague is turning villagers to stone",
+    "love": 1,
+    "skip": 1
+  },
+  {
+    "id": 1,
+    "category": "Main Plot Hooks",
+    "element": "An ancient prophecy predicts the chosen one's arrival",
+    "love": 5,
+    "skip": 1
+  },
+  {
+    "id": 2,
+    "category": "Main Plot Hooks",
+    "element": "The king has been replaced by a doppelganger",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 3,
+    "category": "Main Plot Hooks",
+    "element": "A dragon demands tribute from the local village",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 4,
+    "category": "Main Plot Hooks",
+    "element": "Strange portals are opening across the realm",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 5,
+    "category": "Main Plot Hooks",
+    "element": "An old friend sends a desperate letter asking for help",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 6,
+    "category": "Main Plot Hooks",
+    "element": "A valuable artifact has been stolen from the temple",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 7,
+    "category": "Main Plot Hooks",
+    "element": "The moon hasn't risen for three nights in a row",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 8,
+    "category": "Side Quests",
+    "element": "Help the baker retrieve stolen recipes from bandits",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 9,
+    "category": "Side Quests",
+    "element": "Investigate mysterious sounds in the abandoned mill",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 10,
+    "category": "Side Quests",
+    "element": "Escort a merchant caravan through dangerous territory",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 11,
+    "category": "Side Quests",
+    "element": "Find a rare herb to cure the herbalist's sick child",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 12,
+    "category": "Side Quests",
+    "element": "Solve the riddle of the ancient standing stones",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 13,
+    "category": "Side Quests",
+    "element": "Help reunite two star-crossed lovers from rival families",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 14,
+    "category": "Side Quests",
+    "element": "Track down a mischievous sprite causing havoc in town",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 15,
+    "category": "Side Quests",
+    "element": "Recover a family heirloom from a haunted mansion",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 16,
+    "category": "Character Motivations",
+    "element": "Seeking revenge for a loved one's death",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 17,
+    "category": "Character Motivations",
+    "element": "Trying to prove themselves to their family",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 18,
+    "category": "Character Motivations",
+    "element": "Running from a dark past",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 19,
+    "category": "Character Motivations",
+    "element": "Searching for a missing person",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 20,
+    "category": "Character Motivations",
+    "element": "Driven by insatiable curiosity",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 21,
+    "category": "Character Motivations",
+    "element": "Protecting their homeland from danger",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 22,
+    "category": "Character Motivations",
+    "element": "Seeking redemption for past mistakes",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 23,
+    "category": "Character Motivations",
+    "element": "Pursuing wealth and fame",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 24,
+    "category": "Locations",
+    "element": "A bustling port city with diverse cultures",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 25,
+    "category": "Locations",
+    "element": "An ancient forest filled with magical creatures",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 26,
+    "category": "Locations",
+    "element": "A mysterious floating island in the sky",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 27,
+    "category": "Locations",
+    "element": "Underground caverns with bioluminescent fungi",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 28,
+    "category": "Locations",
+    "element": "A desert oasis hiding ancient secrets",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 29,
+    "category": "Locations",
+    "element": "A frozen tundra with ice castles",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 30,
+    "category": "Locations",
+    "element": "A volcanic region with fire elementals",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 31,
+    "category": "Locations",
+    "element": "A haunted swamp with will-o'-wisps",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 32,
+    "category": "NPCs",
+    "element": "A wise old wizard with a mysterious past",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 33,
+    "category": "NPCs",
+    "element": "A cunning thief with a heart of gold",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 34,
+    "category": "NPCs",
+    "element": "A gruff blacksmith hiding a gentle soul",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 35,
+    "category": "NPCs",
+    "element": "A cheerful innkeeper who knows everyone's secrets",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 36,
+    "category": "NPCs",
+    "element": "A noble knight struggling with their vows",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 37,
+    "category": "NPCs",
+    "element": "A street urchin with surprising knowledge",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 38,
+    "category": "NPCs",
+    "element": "A eccentric inventor creating magical devices",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 39,
+    "category": "NPCs",
+    "element": "A mysterious fortune teller who speaks in riddles",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 40,
+    "category": "Twists",
+    "element": "The villain is actually trying to prevent a greater evil",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 41,
+    "category": "Twists",
+    "element": "The quest giver has been lying about their true intentions",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 42,
+    "category": "Twists",
+    "element": "The artifact is cursed and corrupts those who possess it",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 43,
+    "category": "Twists",
+    "element": "Time is running backwards in this location",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 44,
+    "category": "Twists",
+    "element": "The party member is secretly a spy",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 45,
+    "category": "Twists",
+    "element": "The monster is actually an enchanted person",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 46,
+    "category": "Twists",
+    "element": "The treasure map leads to a trap",
+    "love": 0,
+    "skip": 0
+  },
+  {
+    "id": 47,
+    "category": "Twists",
+    "element": "The prophecy was a trick to manipulate events",
+    "love": 0,
+    "skip": 0
+  }
+]
