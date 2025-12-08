@@ -475,7 +475,142 @@ class QuestAPI(Resource):
             return {'quests': quests}, 200
             
         except Exception as e:
-            return {'message': f'Error retrieving quests: {str(e)}'}, 500
+            return {'message': f'Error retrieving quests: {str(e)}'}, 500# --- API Resource for Key Binding Creation and Retrieval ---
+class KeyBindingAPI(Resource):
+    def post(self):
+        """Save key bindings for a user and game mode"""
+        try:
+            data = request.get_json()
+
+            user_github_id = data.get('userGithubId', '').strip()
+            game_mode = data.get('gameMode', 'action').strip() or 'action'
+
+            move_up_key = data.get('moveUpKey', '').strip()
+            move_left_key = data.get('moveLeftKey', '').strip()
+            move_down_key = data.get('moveDownKey', '').strip()
+            move_right_key = data.get('moveRightKey', '').strip()
+            interact_key = data.get('interactKey', '').strip()
+            jump_key = data.get('jumpKey', '').strip()
+            sprint_key = data.get('sprintKey', '').strip()  # optional
+
+            # Validate required fields
+            missing = []
+            if not user_github_id: missing.append('userGithubId')
+            if not move_up_key: missing.append('moveUpKey')
+            if not move_left_key: missing.append('moveLeftKey')
+            if not move_down_key: missing.append('moveDownKey')
+            if not move_right_key: missing.append('moveRightKey')
+            if not interact_key: missing.append('interactKey')
+            if not jump_key: missing.append('jumpKey')
+
+            if missing:
+                return {'message': f'Missing required fields: {", ".join(missing)}'}, 400
+
+            db_path = get_rpg_db_path()
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+
+            cursor.execute('''
+                INSERT INTO key_bindings (
+                    user_github_id,
+                    game_mode,
+                    move_up_key,
+                    move_left_key,
+                    move_down_key,
+                    move_right_key,
+                    interact_key,
+                    jump_key,
+                    sprint_key
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                user_github_id,
+                game_mode,
+                move_up_key,
+                move_left_key,
+                move_down_key,
+                move_right_key,
+                interact_key,
+                jump_key,
+                sprint_key if sprint_key else None
+            ))
+
+            binding_id = cursor.lastrowid
+            conn.commit()
+            conn.close()
+
+            return {
+                'id': binding_id,
+                'userGithubId': user_github_id,
+                'gameMode': game_mode,
+                'moveUpKey': move_up_key,
+                'moveLeftKey': move_left_key,
+                'moveDownKey': move_down_key,
+                'moveRightKey': move_right_key,
+                'interactKey': interact_key,
+                'jumpKey': jump_key,
+                'sprintKey': sprint_key
+            }, 201
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return {'message': f'Error saving key bindings: {str(e)}'}, 500
+
+    def get(self):
+        """Get the most recent key bindings for a specific user (and optional game mode)"""
+        try:
+            user_github_id = request.args.get('userGithubId', '').strip()
+            game_mode = request.args.get('gameMode', '').strip()
+
+            if not user_github_id:
+                return {'message': 'User GitHub ID is required'}, 400
+
+            db_path = get_rpg_db_path()
+            conn = sqlite3.connect(db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+
+            if game_mode:
+                cursor.execute('''
+                    SELECT * FROM key_bindings
+                    WHERE user_github_id = ? AND game_mode = ?
+                    ORDER BY created_at DESC
+                    LIMIT 1
+                ''', (user_github_id, game_mode))
+            else:
+                cursor.execute('''
+                    SELECT * FROM key_bindings
+                    WHERE user_github_id = ?
+                    ORDER BY created_at DESC
+                    LIMIT 1
+                ''', (user_github_id,))
+
+            row = cursor.fetchone()
+            conn.close()
+
+            if not row:
+                return {'message': 'No key bindings found for this user'}, 404
+
+            binding = {
+                'id': row['id'],
+                'userGithubId': row['user_github_id'],
+                'gameMode': row['game_mode'],
+                'moveUpKey': row['move_up_key'],
+                'moveLeftKey': row['move_left_key'],
+                'moveDownKey': row['move_down_key'],
+                'moveRightKey': row['move_right_key'],
+                'interactKey': row['interact_key'],
+                'jumpKey': row['jump_key'],
+                'sprintKey': row['sprint_key'],
+                'createdAt': row['created_at']
+            }
+
+            return {'binding': binding}, 200
+
+        except Exception as e:
+            return {'message': f'Error retrieving key bindings: {str(e)}'}, 500
+
 
 # ============================================================================
 # STORY ELEMENTS API RESOURCES
