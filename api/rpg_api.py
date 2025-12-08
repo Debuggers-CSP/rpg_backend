@@ -61,6 +61,23 @@ def init_rpg_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+    # Create key_bindings table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS key_bindings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_github_id TEXT NOT NULL,
+            game_mode TEXT NOT NULL,
+            move_up_key TEXT NOT NULL,
+            move_left_key TEXT NOT NULL,
+            move_down_key TEXT NOT NULL,
+            move_right_key TEXT NOT NULL,
+            interact_key TEXT NOT NULL,
+            jump_key TEXT NOT NULL,
+            sprint_key TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
     
     conn.commit()
     conn.close()
