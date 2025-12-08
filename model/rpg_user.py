@@ -1,6 +1,7 @@
 from __init__ import db
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import current_app
 
 class RPGUser(db.Model):
     """
@@ -8,6 +9,7 @@ class RPGUser(db.Model):
     
     The RPG User table stores user credentials for the RPG game
     """
+    __bind_key__ = 'rpg' 
     __tablename__ = 'rpg_users'
 
     # Define the User schema with "vars" from object
@@ -142,7 +144,9 @@ def initRPGUsers():
     Initialize the RPG Users table with default users
     """
     # Create tables if they don't exist
-    db.create_all()
+    with current_app.app_context():
+        engine = db.get_engine(bind='rpg')
+        RPGUser.metadata.create_all(engine)
     
     # Check if users already exist
     if RPGUser.query.count() == 0:

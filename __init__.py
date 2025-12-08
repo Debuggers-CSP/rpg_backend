@@ -94,6 +94,15 @@ app.config['SQLALCHEMY_DATABASE_STRING'] = dbString
 app.config['SQLALCHEMY_DATABASE_URI'] = dbURI
 app.config['SQLALCHEMY_BACKUP_URI'] = backupURI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+rpg_db_dir = os.path.join(app.instance_path, 'rpg')
+os.makedirs(rpg_db_dir, exist_ok=True)
+rpg_db_path = os.path.join(rpg_db_dir, 'rpg.db')
+
+app.config['SQLALCHEMY_BINDS'] = {
+    'rpg': f"sqlite:///{rpg_db_path}"
+}
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 

@@ -37,6 +37,7 @@ from model.user import Section;
 from model.github import GitHubUser
 from model.feedback import Feedback
 from api.analytics import get_date_range
+from model.rpg_user import RPGUser
 # from api.grade_api import grade_api
 from api.study import study_api
 from api.feedback_api import feedback_api
@@ -160,6 +161,11 @@ def u2table():
 def sections():
     sections = Section.query.all()
     return render_template("sections.html", sections=sections)
+
+@app.route('/rpg_stats/')
+def rpg_stats():
+    rpg_users = RPGUser.query.all()
+    return render_template("rpg_stats.html", rpg_users=rpg_users)
 
 # Helper function to extract uploads for a user (ie PFP image)
 @app.route('/uploads/<path:filename>')

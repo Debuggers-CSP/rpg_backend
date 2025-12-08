@@ -1,0 +1,32 @@
+{% extends "layouts/base.html" %}
+
+{% block body %}
+<div class="container mt-4">
+  <h1 class="mb-4">RPG User Stats</h1>
+
+  {% if rpg_users and rpg_users|length %}
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>GitHub ID</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in rpg_users %}
+        <tr>
+          <td>{{ user.id }}</td>
+          <td>{{ user.first_name }}</td>
+          <td>{{ user.last_name }}</td>
+          <td>{{ user.github_id }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No RPG users found.</p>
+  {% endif %}
+</div>
+{% endblock %}
