@@ -1,19 +1,16 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask import Blueprint, request, jsonify
 import sqlite3
 from datetime import datetime
 from contextlib import contextmanager
+import os
 
-app = Flask(__name__)
-CORS(app, resources={
-    r"/api/*": {
-        "origins": ["http://localhost:4500", "http://127.0.0.1:4500"],
-        "methods": ["GET", "OPTIONS"],
-        "allow_headers": ["Content-Type"]
-    }
-})
+rpg_stats_api = Blueprint('rpg_stats_api', __name__, url_prefix='/api/rpg_stats')
 
-DATABASE = 'rpg_statistics.db'
+# 数据库文件路径（放在 instance 或 volumes 目录）
+DATABASE = os.path.join('instance', 'rpg_statistics.db')
+
+# 确保目录存在
+os.makedirs(os.path.dirname(DATABASE), exist_ok=True)
 
 # 数据库连接管理
 @contextmanager
@@ -26,7 +23,8 @@ def get_db():
         conn.close()
 
 # 初始化数据库
-def init_db():
+def init_rpg_stats():
+    """初始化 RPG 统计数据库"""
     with get_db() as conn:
         cursor = conn.cursor()
         
@@ -34,7 +32,7 @@ def init_db():
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS statistics (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                mode TEXT NOT NULL,
+                mode TEXT NOT NULL UNIQUE,
                 count INTEGER NOT NULL DEFAULT 0
             )
         ''')
@@ -54,6 +52,7 @@ def init_db():
         if cursor.fetchone()[0] == 0:
             cursor.execute('INSERT INTO statistics (mode, count) VALUES (?, ?)', ('chill', 0))
             cursor.execute('INSERT INTO statistics (mode, count) VALUES (?, ?)', ('action', 0))
+            print('✓ RPG Statistics database initialized')
         
         conn.commit()
 
@@ -94,21 +93,27 @@ def get_statistics():
         return stats
 
 # API 路由 - 获取统计数据
-@app.route('/api/stats', methods=['GET'])
+@rpg_stats_api.route('/stats', methods=['GET'])
 def get_stats():
+    """GET /api/rpg_stats/stats - 获取统计数据"""
     try:
         stats = get_statistics()
+        print(f'📊 Returning stats: chill={stats["chill"]}, action={stats["action"]}, total={stats["total"]}')
         return jsonify(stats)
     except Exception as e:
+        print(f'❌ Error getting stats: {e}')
         return jsonify({'error': str(e)}), 500
 
-# API 路由 - 记录选择（改为 GET，使用 URL 参数）
-@app.route('/api/stats/record', methods=['GET'])
+# API 路由 - 记录选择
+@rpg_stats_api.route('/record', methods=['GET'])
 def record_selection():
+    """GET /api/rpg_stats/record?mode=chill&userId=xxx - 记录选择"""
     try:
         # 从 URL 参数获取数据
         mode = request.args.get('mode')
         user_id = request.args.get('userId', 'anonymous')
+        
+        print(f'📝 Recording: mode={mode}, userId={user_id}')
         
         if mode not in ['chill', 'action']:
             return jsonify({'error': 'Invalid mode'}), 400
@@ -131,16 +136,19 @@ def record_selection():
             ''', (user_id, mode, timestamp))
             
             conn.commit()
+            print(f'✓ Successfully recorded {mode} selection')
         
         stats = get_statistics()
         return jsonify(stats)
     
     except Exception as e:
+        print(f'❌ Error recording selection: {e}')
         return jsonify({'error': str(e)}), 500
 
-# API 路由 - 重置统计（改为 GET）
-@app.route('/api/stats/reset', methods=['GET'])
+# API 路由 - 重置统计
+@rpg_stats_api.route('/reset', methods=['GET', 'POST'])
 def reset_stats():
+    """GET/POST /api/rpg_stats/reset - 重置统计数据"""
     try:
         with get_db() as conn:
             cursor = conn.cursor()
@@ -152,26 +160,20 @@ def reset_stats():
             cursor.execute('DELETE FROM history')
             
             conn.commit()
+            print('✓ Statistics reset successfully')
         
         stats = get_statistics()
         return jsonify(stats)
     
     except Exception as e:
+        print(f'❌ Error resetting stats: {e}')
         return jsonify({'error': str(e)}), 500
 
-@app.route('/health', methods=['GET'])
+@rpg_stats_api.route('/health', methods=['GET'])
 def health():
-    return jsonify({'status': 'healthy', 'database': DATABASE})
-
-@app.route('/')
-def home():
-    return jsonify({'message': 'RPG Statistics API', 'status': 'running'})
-
-# 启动时初始化数据库
-if __name__ == '__main__':
-    print('Initializing database...')
-    init_db()
-    print('Database initialized!')
-    print(f'Database file: {DATABASE}')
-    print('Starting Flask server...')
-    app.run(debug=True, host='0.0.0.0', port=8587)
+    """GET /api/rpg_stats/health - 健康检查"""
+    return jsonify({
+        'status': 'healthy', 
+        'database': DATABASE,
+        'message': 'RPG Statistics API is running'
+    })

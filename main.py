@@ -31,6 +31,7 @@ from api.classroom_api import classroom_api
 from hacks.joke import joke_api  # Import the joke API blueprint
 from api.post import post_api  # Import the social media post API
 from api.rpg_api import rpg_api  # Import the RPG game API
+from api.rpg_stats_api import rpg_stats_api, init_rpg_stats
 #from api.announcement import announcement_api ##temporary revert
 
 # database Initialization functions
@@ -86,6 +87,7 @@ app.register_blueprint(feedback_api)
 app.register_blueprint(joke_api)  # Register the joke API blueprint
 app.register_blueprint(post_api)  # Register the social media post API
 app.register_blueprint(rpg_api)  # Register the RPG game API
+app.register_blueprint(rpg_stats_api)
 # app.register_blueprint(announcement_api) ##temporary revert
 
 # Jokes file initialization
@@ -93,6 +95,7 @@ with app.app_context():
     initJokes()
     initStoryElements()  # Initialize story elements
     initRPGUsers()  # Initialize RPG users table
+    init_rpg_stats()
     CharacterSheet.metadata.create_all(bind=db.get_engine(bind='rpg'))
     Quest.metadata.create_all(bind=db.get_engine(bind='rpg'))
 # Tell Flask-Login the view function name of your login route
