@@ -67,6 +67,8 @@ def init_rpg_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_github_id TEXT NOT NULL,
             game_mode TEXT NOT NULL,
+
+            -- Core movement & interaction
             move_up_key TEXT NOT NULL,
             move_left_key TEXT NOT NULL,
             move_down_key TEXT NOT NULL,
@@ -74,9 +76,59 @@ def init_rpg_db():
             interact_key TEXT NOT NULL,
             jump_key TEXT NOT NULL,
             sprint_key TEXT,
+
+            -- Universal extras
+            secondary_interact_key TEXT,
+            quick_action_key TEXT,
+            inventory_key TEXT,
+            map_key TEXT,
+            pause_key TEXT,
+            quick_menu_key TEXT,
+            screenshot_key TEXT,
+
+            -- Cozy extras
+            tool1_key TEXT,
+            tool2_key TEXT,
+            tool3_key TEXT,
+            tool4_key TEXT,
+            tool5_key TEXT,
+            emote_wheel_key TEXT,
+            craft_menu_key TEXT,
+            cozy_zoom_key TEXT,
+            chill_action_key TEXT,
+            gardening_key TEXT,
+            backpack_key TEXT,
+            decor_mode_key TEXT,
+            cozy_slow_walk_key TEXT,
+            cozy_grid_toggle_key TEXT,
+            cozy_inspect_key TEXT,
+            pet_whistle_key TEXT,
+
+            -- Action combat
+            primary_attack_key TEXT,
+            heavy_attack_key TEXT,
+            ability1_key TEXT,
+            ability2_key TEXT,
+            ability3_key TEXT,
+            ability4_key TEXT,
+            ultimate_key TEXT,
+            dodge_key TEXT,
+            crouch_key TEXT,
+            grenade_key TEXT,
+            reload_key TEXT,
+            execute_key TEXT,
+            melee_key TEXT,
+            weapon_swap_key TEXT,
+            mark_target_key TEXT,
+            focus_state_key TEXT,
+            lock_on_key TEXT,
+            tactical_wheel_key TEXT,
+            taunt_key TEXT,
+
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+
 
     
     conn.commit()
@@ -483,6 +535,7 @@ class KeyBindingAPI(Resource):
             user_github_id = data.get('userGithubId', '').strip()
             game_mode = data.get('gameMode', 'action').strip() or 'action'
 
+            # Core movement & interaction
             move_up_key = data.get('moveUpKey', '').strip()
             move_left_key = data.get('moveLeftKey', '').strip()
             move_down_key = data.get('moveDownKey', '').strip()
@@ -490,6 +543,54 @@ class KeyBindingAPI(Resource):
             interact_key = data.get('interactKey', '').strip()
             jump_key = data.get('jumpKey', '').strip()
             sprint_key = data.get('sprintKey', '').strip()  # optional
+
+            # Universal extras
+            secondary_interact_key = data.get('secondaryInteractKey', '').strip()
+            quick_action_key = data.get('quickActionKey', '').strip()
+            inventory_key = data.get('inventoryKey', '').strip()
+            map_key = data.get('mapKey', '').strip()
+            pause_key = data.get('pauseKey', '').strip()
+            quick_menu_key = data.get('quickMenuKey', '').strip()
+            screenshot_key = data.get('screenshotKey', '').strip()
+
+            # Cozy extras
+            tool1_key = data.get('tool1Key', '').strip()
+            tool2_key = data.get('tool2Key', '').strip()
+            tool3_key = data.get('tool3Key', '').strip()
+            tool4_key = data.get('tool4Key', '').strip()
+            tool5_key = data.get('tool5Key', '').strip()
+            emote_wheel_key = data.get('emoteWheelKey', '').strip()
+            craft_menu_key = data.get('craftMenuKey', '').strip()
+            cozy_zoom_key = data.get('cozyZoomKey', '').strip()
+            chill_action_key = data.get('chillActionKey', '').strip()
+            gardening_key = data.get('gardeningKey', '').strip()
+            backpack_key = data.get('backpackKey', '').strip()
+            decor_mode_key = data.get('decorModeKey', '').strip()
+            cozy_slow_walk_key = data.get('cozySlowWalkKey', '').strip()
+            cozy_grid_toggle_key = data.get('cozyGridToggleKey', '').strip()
+            cozy_inspect_key = data.get('cozyInspectKey', '').strip()
+            pet_whistle_key = data.get('petWhistleKey', '').strip()
+
+            # Action combat
+            primary_attack_key = data.get('primaryAttackKey', '').strip()
+            heavy_attack_key = data.get('heavyAttackKey', '').strip()
+            ability1_key = data.get('ability1Key', '').strip()
+            ability2_key = data.get('ability2Key', '').strip()
+            ability3_key = data.get('ability3Key', '').strip()
+            ability4_key = data.get('ability4Key', '').strip()
+            ultimate_key = data.get('ultimateKey', '').strip()
+            dodge_key = data.get('dodgeKey', '').strip()
+            crouch_key = data.get('crouchKey', '').strip()
+            grenade_key = data.get('grenadeKey', '').strip()
+            reload_key = data.get('reloadKey', '').strip()
+            execute_key = data.get('executeKey', '').strip()
+            melee_key = data.get('meleeKey', '').strip()
+            weapon_swap_key = data.get('weaponSwapKey', '').strip()
+            mark_target_key = data.get('markTargetKey', '').strip()
+            focus_state_key = data.get('focusStateKey', '').strip()
+            lock_on_key = data.get('lockOnKey', '').strip()
+            tactical_wheel_key = data.get('tacticalWheelKey', '').strip()
+            taunt_key = data.get('tauntKey', '').strip()
 
             # Validate required fields
             missing = []
@@ -519,9 +620,51 @@ class KeyBindingAPI(Resource):
                     move_right_key,
                     interact_key,
                     jump_key,
-                    sprint_key
+                    sprint_key,
+                    secondary_interact_key,
+                    quick_action_key,
+                    inventory_key,
+                    map_key,
+                    pause_key,
+                    quick_menu_key,
+                    screenshot_key,
+                    tool1_key,
+                    tool2_key,
+                    tool3_key,
+                    tool4_key,
+                    tool5_key,
+                    emote_wheel_key,
+                    craft_menu_key,
+                    cozy_zoom_key,
+                    chill_action_key,
+                    gardening_key,
+                    backpack_key,
+                    decor_mode_key,
+                    cozy_slow_walk_key,
+                    cozy_grid_toggle_key,
+                    cozy_inspect_key,
+                    pet_whistle_key,
+                    primary_attack_key,
+                    heavy_attack_key,
+                    ability1_key,
+                    ability2_key,
+                    ability3_key,
+                    ability4_key,
+                    ultimate_key,
+                    dodge_key,
+                    crouch_key,
+                    grenade_key,
+                    reload_key,
+                    execute_key,
+                    melee_key,
+                    weapon_swap_key,
+                    mark_target_key,
+                    focus_state_key,
+                    lock_on_key,
+                    tactical_wheel_key,
+                    taunt_key
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 user_github_id,
                 game_mode,
@@ -531,7 +674,49 @@ class KeyBindingAPI(Resource):
                 move_right_key,
                 interact_key,
                 jump_key,
-                sprint_key if sprint_key else None
+                sprint_key if sprint_key else None,
+                secondary_interact_key or None,
+                quick_action_key or None,
+                inventory_key or None,
+                map_key or None,
+                pause_key or None,
+                quick_menu_key or None,
+                screenshot_key or None,
+                tool1_key or None,
+                tool2_key or None,
+                tool3_key or None,
+                tool4_key or None,
+                tool5_key or None,
+                emote_wheel_key or None,
+                craft_menu_key or None,
+                cozy_zoom_key or None,
+                chill_action_key or None,
+                gardening_key or None,
+                backpack_key or None,
+                decor_mode_key or None,
+                cozy_slow_walk_key or None,
+                cozy_grid_toggle_key or None,
+                cozy_inspect_key or None,
+                pet_whistle_key or None,
+                primary_attack_key or None,
+                heavy_attack_key or None,
+                ability1_key or None,
+                ability2_key or None,
+                ability3_key or None,
+                ability4_key or None,
+                ultimate_key or None,
+                dodge_key or None,
+                crouch_key or None,
+                grenade_key or None,
+                reload_key or None,
+                execute_key or None,
+                melee_key or None,
+                weapon_swap_key or None,
+                mark_target_key or None,
+                focus_state_key or None,
+                lock_on_key or None,
+                tactical_wheel_key or None,
+                taunt_key or None
             ))
 
             binding_id = cursor.lastrowid
@@ -548,13 +733,59 @@ class KeyBindingAPI(Resource):
                 'moveRightKey': move_right_key,
                 'interactKey': interact_key,
                 'jumpKey': jump_key,
-                'sprintKey': sprint_key
+                'sprintKey': sprint_key,
+
+                'secondaryInteractKey': secondary_interact_key,
+                'quickActionKey': quick_action_key,
+                'inventoryKey': inventory_key,
+                'mapKey': map_key,
+                'pauseKey': pause_key,
+                'quickMenuKey': quick_menu_key,
+                'screenshotKey': screenshot_key,
+
+                'tool1Key': tool1_key,
+                'tool2Key': tool2_key,
+                'tool3Key': tool3_key,
+                'tool4Key': tool4_key,
+                'tool5Key': tool5_key,
+                'emoteWheelKey': emote_wheel_key,
+                'craftMenuKey': craft_menu_key,
+                'cozyZoomKey': cozy_zoom_key,
+                'chillActionKey': chill_action_key,
+                'gardeningKey': gardening_key,
+                'backpackKey': backpack_key,
+                'decorModeKey': decor_mode_key,
+                'cozySlowWalkKey': cozy_slow_walk_key,
+                'cozyGridToggleKey': cozy_grid_toggle_key,
+                'cozyInspectKey': cozy_inspect_key,
+                'petWhistleKey': pet_whistle_key,
+
+                'primaryAttackKey': primary_attack_key,
+                'heavyAttackKey': heavy_attack_key,
+                'ability1Key': ability1_key,
+                'ability2Key': ability2_key,
+                'ability3Key': ability3_key,
+                'ability4Key': ability4_key,
+                'ultimateKey': ultimate_key,
+                'dodgeKey': dodge_key,
+                'crouchKey': crouch_key,
+                'grenadeKey': grenade_key,
+                'reloadKey': reload_key,
+                'executeKey': execute_key,
+                'meleeKey': melee_key,
+                'weaponSwapKey': weapon_swap_key,
+                'markTargetKey': mark_target_key,
+                'focusStateKey': focus_state_key,
+                'lockOnKey': lock_on_key,
+                'tacticalWheelKey': tactical_wheel_key,
+                'tauntKey': taunt_key
             }, 201
 
         except Exception as e:
             import traceback
             traceback.print_exc()
             return {'message': f'Error saving key bindings: {str(e)}'}, 500
+
 
     def get(self):
         """Get the most recent key bindings for a specific user (and optional game mode)"""
@@ -595,6 +826,7 @@ class KeyBindingAPI(Resource):
                 'id': row['id'],
                 'userGithubId': row['user_github_id'],
                 'gameMode': row['game_mode'],
+
                 'moveUpKey': row['move_up_key'],
                 'moveLeftKey': row['move_left_key'],
                 'moveDownKey': row['move_down_key'],
@@ -602,6 +834,51 @@ class KeyBindingAPI(Resource):
                 'interactKey': row['interact_key'],
                 'jumpKey': row['jump_key'],
                 'sprintKey': row['sprint_key'],
+
+                'secondaryInteractKey': row['secondary_interact_key'],
+                'quickActionKey': row['quick_action_key'],
+                'inventoryKey': row['inventory_key'],
+                'mapKey': row['map_key'],
+                'pauseKey': row['pause_key'],
+                'quickMenuKey': row['quick_menu_key'],
+                'screenshotKey': row['screenshot_key'],
+
+                'tool1Key': row['tool1_key'],
+                'tool2Key': row['tool2_key'],
+                'tool3Key': row['tool3_key'],
+                'tool4Key': row['tool4_key'],
+                'tool5Key': row['tool5_key'],
+                'emoteWheelKey': row['emote_wheel_key'],
+                'craftMenuKey': row['craft_menu_key'],
+                'cozyZoomKey': row['cozy_zoom_key'],
+                'chillActionKey': row['chill_action_key'],
+                'gardeningKey': row['gardening_key'],
+                'backpackKey': row['backpack_key'],
+                'decorModeKey': row['decor_mode_key'],
+                'cozySlowWalkKey': row['cozy_slow_walk_key'],
+                'cozyGridToggleKey': row['cozy_grid_toggle_key'],
+                'cozyInspectKey': row['cozy_inspect_key'],
+                'petWhistleKey': row['pet_whistle_key'],
+
+                'primaryAttackKey': row['primary_attack_key'],
+                'heavyAttackKey': row['heavy_attack_key'],
+                'ability1Key': row['ability1_key'],
+                'ability2Key': row['ability2_key'],
+                'ability3Key': row['ability3_key'],
+                'ability4Key': row['ability4_key'],
+                'ultimateKey': row['ultimate_key'],
+                'dodgeKey': row['dodge_key'],
+                'crouchKey': row['crouch_key'],
+                'grenadeKey': row['grenade_key'],
+                'reloadKey': row['reload_key'],
+                'executeKey': row['execute_key'],
+                'meleeKey': row['melee_key'],
+                'weaponSwapKey': row['weapon_swap_key'],
+                'markTargetKey': row['mark_target_key'],
+                'focusStateKey': row['focus_state_key'],
+                'lockOnKey': row['lock_on_key'],
+                'tacticalWheelKey': row['tactical_wheel_key'],
+                'tauntKey': row['taunt_key'],
                 'createdAt': row['created_at']
             }
 
@@ -609,6 +886,7 @@ class KeyBindingAPI(Resource):
 
         except Exception as e:
             return {'message': f'Error retrieving key bindings: {str(e)}'}, 500
+
 
 
 # ============================================================================
