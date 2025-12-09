@@ -501,7 +501,8 @@ class KeyBindingAPI(Resource):
             if not move_down_key: missing.append('moveDownKey')
             if not move_right_key: missing.append('moveRightKey')
             if not interact_key: missing.append('interactKey')
-            if not jump_key: missing.append('jumpKey')
+            if game_mode != 'cozy' and not jump_key:
+                missing.append('jumpKey')
 
             if missing:
                 return {'message': f'Missing required fields: {", ".join(missing)}'}, 400
