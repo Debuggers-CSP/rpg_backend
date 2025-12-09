@@ -10,21 +10,21 @@
     "id": 1,
     "category": "Main Plot Hooks",
     "element": "An ancient prophecy predicts the chosen one's arrival",
-    "love": 2,
+    "love": 5,
     "skip": 0
   },
   {
     "id": 2,
     "category": "Main Plot Hooks",
     "element": "The king has been replaced by a doppelganger",
-    "love": 2,
+    "love": 4,
     "skip": 1
   },
   {
     "id": 3,
     "category": "Main Plot Hooks",
     "element": "A dragon demands tribute from the local village",
-    "love": 0,
+    "love": 11,
     "skip": 0
   },
   {
@@ -38,7 +38,7 @@
     "id": 5,
     "category": "Side Quests",
     "element": "Help the baker retrieve stolen recipes from bandits",
-    "love": 0,
+    "love": 1,
     "skip": 0
   },
   {
@@ -109,7 +109,7 @@
     "category": "Locations",
     "element": "A bustling port city with diverse cultures",
     "love": 2,
-    "skip": 0
+    "skip": 4
   },
   {
     "id": 16,
