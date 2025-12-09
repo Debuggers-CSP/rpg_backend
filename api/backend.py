@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app, resources={
     r"/api/*": {
         "origins": ["http://localhost:4500", "http://127.0.0.1:4500"],
-        "methods": ["GET", "POST", "OPTIONS"],
+        "methods": ["GET", "OPTIONS"],
         "allow_headers": ["Content-Type"]
     }
 })
@@ -93,7 +93,7 @@ def get_statistics():
         
         return stats
 
-# API 路由
+# API 路由 - 获取统计数据
 @app.route('/api/stats', methods=['GET'])
 def get_stats():
     try:
@@ -102,12 +102,13 @@ def get_stats():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/stats/record', methods=['POST'])
+# API 路由 - 记录选择（改为 GET，使用 URL 参数）
+@app.route('/api/stats/record', methods=['GET'])
 def record_selection():
     try:
-        data = request.json
-        mode = data.get('mode')
-        user_id = data.get('userId', 'anonymous')
+        # 从 URL 参数获取数据
+        mode = request.args.get('mode')
+        user_id = request.args.get('userId', 'anonymous')
         
         if mode not in ['chill', 'action']:
             return jsonify({'error': 'Invalid mode'}), 400
@@ -137,7 +138,8 @@ def record_selection():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/stats/reset', methods=['POST'])
+# API 路由 - 重置统计（改为 GET）
+@app.route('/api/stats/reset', methods=['GET'])
 def reset_stats():
     try:
         with get_db() as conn:
@@ -160,6 +162,10 @@ def reset_stats():
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({'status': 'healthy', 'database': DATABASE})
+
+@app.route('/')
+def home():
+    return jsonify({'message': 'RPG Statistics API', 'status': 'running'})
 
 # 启动时初始化数据库
 if __name__ == '__main__':
