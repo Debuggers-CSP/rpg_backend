@@ -984,67 +984,6 @@ api.add_resource(StoryElementAPI, '/api/rpg/story/<int:id>', '/api/rpg/story/<in
 api.add_resource(StoryLoveAPI, '/api/rpg/story/love/<int:id>', '/api/rpg/story/love/<int:id>/')
 api.add_resource(StorySkipAPI, '/api/rpg/story/skip/<int:id>', '/api/rpg/story/skip/<int:id>/')
 
-# Narrative content API resources
-class NarrativeGuidelinesAPI(Resource):
-    """Provide short narrative guidelines for a given game mode.
-
-    Frontend: used by game UI or editor pages to show the narrative tone
-    and writing goals for the selected `game_mode`.
-    Endpoint: `/api/rpg/narrative/<game_mode>`
-    """
-    def get(self, game_mode):
-        gm = (game_mode or '').lower()
-        if gm in ('cozy', 'chill'):
-            guidelines = {
-                'tone': 'Warm, intimate, character-driven',
-                'focus': 'Relationships, daily life, community, gentle growth',
-                'stakes': 'Personal growth, emotional beats, small meaningful goals',
-                'avoid': 'Graphic violence, heavy horror, nihilistic outcomes'
-            }
-        elif gm == 'action':
-            guidelines = {
-                'tone': 'Energetic, tense, cinematic',
-                'focus': 'Conflict, objectives, escalating challenges',
-                'stakes': 'High-risk consequences, dramatic reversals',
-                'avoid': 'Aimless wandering, low-stakes encounters'
-            }
-        else:
-            return jsonify({'error': 'Invalid game_mode. Use "action" or "cozy"/"chill".'}), 400
-
-        return jsonify({'gameMode': gm, 'guidelines': guidelines})
-
-
-class NarrativeTipsAPI(Resource):
-    """Return actionable narrative tips for the selected mode.
-
-    Frontend: tooltips, writing prompts, or help text shown when the player
-    selects a mode in the UI. Endpoint: `/api/rpg/narrative-tips/<game_mode>`
-    """
-    def get(self, game_mode):
-        gm = (game_mode or '').lower()
-        if gm in ('cozy', 'chill'):
-            tips = [
-                'Focus scenes on conversation and small rituals that reveal character.',
-                'Use sensory detail (smells, textures) to create a cozy atmosphere.',
-                'Make goals tied to relationships or community projects rather than combat.',
-                'Keep conflict interpersonal and resolvable through choices and dialogue.'
-            ]
-        elif gm == 'action':
-            tips = [
-                'Keep pacing tight: start scenes with an immediate problem or threat.',
-                'Use clear, visible stakes that escalate across the encounter.',
-                'Design choices that affect resource or positional advantage in combat.',
-                'Vary obstacle types (timing, skill, puzzle, stealth) to sustain interest.'
-            ]
-        else:
-            return jsonify({'error': 'Invalid game_mode. Use "action" or "cozy"/"chill".'}), 400
-
-        return jsonify({'gameMode': gm, 'tips': tips})
-
-# Narrative content endpoints (mode-specific guidance & tips)
-api.add_resource(NarrativeGuidelinesAPI, '/api/rpg/narrative/<string:game_mode>')
-api.add_resource(NarrativeTipsAPI, '/api/rpg/narrative-tips/<string:game_mode>')
-
 # HTML endpoint for testing
 @rpg_api.route('/rpg')
 def rpg_home():
