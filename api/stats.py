@@ -14,7 +14,7 @@ CORS(app, resources={
     }
 })
 
-DATABASE = 'rpg_statistics.db'
+DATABASE = os.path.join('instance', 'rpg', 'rpg_statistics.db')
 
 # ... [保持其他函数不变，get_db(), init_db(), get_statistics()] ...
 

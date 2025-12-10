@@ -13,7 +13,7 @@ CORS(app, resources={
     }
 })
 
-DATABASE = 'rpg_statistics.db'
+DATABASE = os.path.join('instance', 'rpg', 'rpg_statistics.db')
 
 # 数据库连接管理
 @contextmanager

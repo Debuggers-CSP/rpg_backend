@@ -1018,8 +1018,7 @@ def rpg_home():
     return html_content
 
 # --- RPG Statistics (moved from api/rpg_stats_api.py) ---
-# Database file for RPG statistics (kept relative to project like the original)
-DATABASE = os.path.join('instance', 'rpg_statistics.db')
+DATABASE = os.path.join('instance', 'rpg', 'rpg_statistics.db')
 
 # Ensure directory exists
 os.makedirs(os.path.dirname(DATABASE), exist_ok=True)
