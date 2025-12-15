@@ -59,10 +59,10 @@ def init_rpg_db():
     """Initialize SQLite database for RPG game with character sheets and quests tables"""
     db_path = get_rpg_db_path()
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
-
+    
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-
+    
     # Create character_sheets table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS character_sheets (
@@ -77,7 +77,7 @@ def init_rpg_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-
+    
     # Create quests table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS quests (
@@ -92,7 +92,18 @@ def init_rpg_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-    # Create key_bindings table
+
+    # 🔧 MIGRATION: drop old key_bindings table if it doesn't have the new columns
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='key_bindings'")
+    table_exists = cursor.fetchone()
+    if table_exists:
+        cursor.execute("PRAGMA table_info(key_bindings)")
+        cols = [row[1] for row in cursor.fetchall()]
+        # if this column is missing, it's the old schema → drop and recreate
+        if 'secondary_interact_key' not in cols:
+            cursor.execute("DROP TABLE key_bindings")
+
+    # Create key_bindings table (new schema)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS key_bindings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -162,6 +173,7 @@ def init_rpg_db():
 
     conn.commit()
     conn.close()
+
 
 # Call this when the module loads
 init_rpg_db()
