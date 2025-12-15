@@ -674,62 +674,62 @@ class KeyBindingAPI(Resource):
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
 
-            cursor.execute('''
-                INSERT INTO key_bindings (
-                    user_github_id,
-                    game_mode,
-                    move_up_key,
-                    move_left_key,
-                    move_down_key,
-                    move_right_key,
-                    interact_key,
-                    jump_key,
-                    sprint_key,
-                    secondary_interact_key,
-                    quick_action_key,
-                    inventory_key,
-                    map_key,
-                    pause_key,
-                    quick_menu_key,
-                    screenshot_key,
-                    tool1_key,
-                    tool2_key,
-                    tool3_key,
-                    tool4_key,
-                    tool5_key,
-                    emote_wheel_key,
-                    craft_menu_key,
-                    cozy_zoom_key,
-                    chill_action_key,
-                    gardening_key,
-                    backpack_key,
-                    decor_mode_key,
-                    cozy_slow_walk_key,
-                    cozy_grid_toggle_key,
-                    cozy_inspect_key,
-                    pet_whistle_key,
-                    primary_attack_key,
-                    heavy_attack_key,
-                    ability1_key,
-                    ability2_key,
-                    ability3_key,
-                    ability4_key,
-                    ultimate_key,
-                    dodge_key,
-                    crouch_key,
-                    grenade_key,
-                    reload_key,
-                    execute_key,
-                    melee_key,
-                    weapon_swap_key,
-                    mark_target_key,
-                    focus_state_key,
-                    lock_on_key,
-                    tactical_wheel_key,
-                    taunt_key
-                )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
+            # ✅ SAFE INSERT: column count always matches value count
+            columns = [
+                "user_github_id",
+                "game_mode",
+                "move_up_key",
+                "move_left_key",
+                "move_down_key",
+                "move_right_key",
+                "interact_key",
+                "jump_key",
+                "sprint_key",
+                "secondary_interact_key",
+                "quick_action_key",
+                "inventory_key",
+                "map_key",
+                "pause_key",
+                "quick_menu_key",
+                "screenshot_key",
+                "tool1_key",
+                "tool2_key",
+                "tool3_key",
+                "tool4_key",
+                "tool5_key",
+                "emote_wheel_key",
+                "craft_menu_key",
+                "cozy_zoom_key",
+                "chill_action_key",
+                "gardening_key",
+                "backpack_key",
+                "decor_mode_key",
+                "cozy_slow_walk_key",
+                "cozy_grid_toggle_key",
+                "cozy_inspect_key",
+                "pet_whistle_key",
+                "primary_attack_key",
+                "heavy_attack_key",
+                "ability1_key",
+                "ability2_key",
+                "ability3_key",
+                "ability4_key",
+                "ultimate_key",
+                "dodge_key",
+                "crouch_key",
+                "grenade_key",
+                "reload_key",
+                "execute_key",
+                "melee_key",
+                "weapon_swap_key",
+                "mark_target_key",
+                "focus_state_key",
+                "lock_on_key",
+                "tactical_wheel_key",
+                "taunt_key",
+            ]
+
+            values = [
                 user_github_id,
                 game_mode,
                 move_up_key,
@@ -738,7 +738,7 @@ class KeyBindingAPI(Resource):
                 move_right_key,
                 interact_key,
                 jump_key,
-                sprint_key if sprint_key else None,
+                sprint_key or None,
                 secondary_interact_key or None,
                 quick_action_key or None,
                 inventory_key or None,
@@ -780,8 +780,13 @@ class KeyBindingAPI(Resource):
                 focus_state_key or None,
                 lock_on_key or None,
                 tactical_wheel_key or None,
-                taunt_key or None
-            ))
+                taunt_key or None,
+            ]
+
+            placeholders = ", ".join(["?"] * len(columns))
+            sql = f"INSERT INTO key_bindings ({', '.join(columns)}) VALUES ({placeholders})"
+            cursor.execute(sql, values)
+
 
             binding_id = cursor.lastrowid
             conn.commit()
