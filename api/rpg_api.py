@@ -44,24 +44,39 @@ api = Api(rpg_api)
 # ---------------------------------------------------------------------------
 
 # Helper function to get the correct database path
-def get_rpg_db_path():
-    """Get the absolute path to the RPG database"""
+def get_rpg_db_path(app=None):
+    """
+    Always store the RPG db under Flask's instance folder:
+      <instance>/rpg/rpg.db
+    This keeps the path consistent across import-time and request-time.
+    """
     import os
     from flask import current_app
-    try:
-        app_root = current_app.root_path
-    except:
-        app_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    return os.path.join(app_root, 'instance', 'rpg', 'rpg.db')
+
+    if app is None:
+        try:
+            app = current_app._get_current_object()
+        except Exception:
+            app = None
+
+    if app is not None:
+        base = app.instance_path
+    else:
+        # Fallback only if called outside Flask (rare)
+        base = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "instance")
+
+    return os.path.join(base, "rpg", "rpg.db")
+
 
 # Initialize RPG database with all tables
-def init_rpg_db():
+def init_rpg_db(app=None):
     """Initialize SQLite database for RPG game with character sheets and quests tables"""
-    db_path = get_rpg_db_path()
+    db_path = get_rpg_db_path(app=app)
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
-    
+
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
+
     
     # Create character_sheets table
     cursor.execute('''
@@ -183,8 +198,11 @@ def init_rpg_db():
     conn.close()
 
 
-# Call this when the module loads
-init_rpg_db()
+@rpg_api.record_once
+def _init_db_on_register(state):
+    # Runs when the blueprint is registered with the Flask app
+    init_rpg_db(app=state.app)
+
 
 # --- API Resource: RPG User Registration and Retrieval ---
 class RPGDataAPI(Resource):
