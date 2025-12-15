@@ -100,17 +100,16 @@ def init_rpg_db():
         cursor.execute("PRAGMA table_info(key_bindings)")
         cols = [row[1] for row in cursor.fetchall()]
 
-        # Must-have columns for the current schema
         required_cols = [
-            'secondary_interact_key',   # your current column name
+            'secondary_interact_key',
             'quick_action_key',
             'quick_menu_key',
             'screenshot_key'
         ]
 
-        # If ANY required column is missing, table is outdated → drop it
         if any(c not in cols for c in required_cols):
             cursor.execute("DROP TABLE key_bindings")
+
 
 
     # Create key_bindings table (new schema)
