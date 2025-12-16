@@ -66,7 +66,7 @@
     "id": 9,
     "category": "Side Quests",
     "element": "Solve the riddle of the ancient standing stones",
-    "love": 0,
+    "love": 7,
     "skip": 0
   },
   {
@@ -144,7 +144,7 @@
     "category": "NPCs",
     "element": "A wise old wizard with a mysterious past",
     "love": 0,
-    "skip": 0
+    "skip": 13
   },
   {
     "id": 21,
