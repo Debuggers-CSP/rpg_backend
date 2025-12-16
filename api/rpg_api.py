@@ -209,6 +209,11 @@ def init_rpg_db(app=None):
         )
     ''')
 
+        # Ensure one row per (user, game_mode) so POST can upsert instead of creating duplicates
+    cursor.execute('''
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_systems_user_mode
+        ON systems (user_github_id, game_mode)
+    ''')
 
     conn.commit()
     conn.close()
@@ -1019,7 +1024,12 @@ class GameSystemsAPI(Resource):
             cursor.execute('''
                 INSERT INTO systems (user_github_id, game_mode, systems_json)
                 VALUES (?, ?, ?)
+                ON CONFLICT(user_github_id, game_mode)
+                DO UPDATE SET
+                    systems_json = excluded.systems_json,
+                    created_at = CURRENT_TIMESTAMP
             ''', (user_github_id, game_mode, systems_json))
+
 
             systems_id = cursor.lastrowid
             conn.commit()
